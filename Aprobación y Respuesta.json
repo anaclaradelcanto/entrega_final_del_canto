@@ -1,0 +1,388 @@
+{
+  "name": "Aprobación y Respuesta",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2e9afeb0-7acb-4ae9-b96e-cd5b0d8f7569",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appTnLHNgYMQuRDjp",
+          "mode": "list",
+          "cachedResultName": "Entrega final",
+          "cachedResultUrl": "https://airtable.com/appTnLHNgYMQuRDjp"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldUjqMOSU3m8Mwl",
+          "mode": "list",
+          "cachedResultName": "Entrega final",
+          "cachedResultUrl": "https://airtable.com/appTnLHNgYMQuRDjp/tbldUjqMOSU3m8Mwl"
+        },
+        "filterByFormula": "AND({Aprobado} = TRUE(), {Estado} = \"Procesado por IA\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4e2599b6-729f-4349-9702-7d954078da01",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "AsdBG0ecYey3lc08",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "anaclara.delcanto@gmail.com",
+        "toEmail": "={{ $('Search records').item.json.fields['email cliente'] }}",
+        "subject": "={{ \"Re: \" + $json.fields.Asunto }}",
+        "html": "={{ $json.fields['borrador respuesta'] }}\n\n---\nSaludos,\nEquipo de Soporte",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "740dd4ac-53cd-489f-83ef-fdbe471997dc",
+      "name": "Send an Email",
+      "webhookId": "74c0364c-60a6-4363-b7d8-a973a86ebc1b",
+      "credentials": {
+        "smtp": {
+          "id": "51fqoRMLSKwwLitS",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appTnLHNgYMQuRDjp",
+          "mode": "list",
+          "cachedResultName": "Entrega final",
+          "cachedResultUrl": "https://airtable.com/appTnLHNgYMQuRDjp"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldUjqMOSU3m8Mwl",
+          "mode": "list",
+          "cachedResultName": "Entrega final",
+          "cachedResultUrl": "https://airtable.com/appTnLHNgYMQuRDjp/tbldUjqMOSU3m8Mwl"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "={{ [\"Respondido\"] }}",
+            "id": "={{ $('Search records').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre cliente",
+              "displayName": "Nombre cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "email cliente",
+              "displayName": "email cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Asunto",
+              "displayName": "Asunto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "cuerpo_original",
+              "displayName": "cuerpo_original",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Bug técnico",
+                  "value": "Bug técnico"
+                },
+                {
+                  "name": "Facturación",
+                  "value": "Facturación"
+                },
+                {
+                  "name": "Consulta general",
+                  "value": "Consulta general"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "urgencia",
+              "displayName": "urgencia",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "baja",
+                  "value": "baja"
+                },
+                {
+                  "name": "media",
+                  "value": "media"
+                },
+                {
+                  "name": "alta",
+                  "value": "alta"
+                },
+                {
+                  "name": "",
+                  "value": ""
+                },
+                {
+                  "name": "Alta",
+                  "value": "Alta"
+                },
+                {
+                  "name": "Baja",
+                  "value": "Baja"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "borrador respuesta",
+              "displayName": "borrador respuesta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "Pendiente ",
+                  "value": "Pendiente "
+                },
+                {
+                  "name": "Pendiente ",
+                  "value": "Pendiente "
+                },
+                {
+                  "name": "Procesado por IA",
+                  "value": "Procesado por IA"
+                },
+                {
+                  "name": " Respondido",
+                  "value": " Respondido"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado",
+              "displayName": "Aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Fecha_Ingreso",
+              "displayName": "Fecha_Ingreso",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Ultima_Modificacion",
+              "displayName": "Ultima_Modificacion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "d90bf2b4-aa6c-4f93-8e3d-609f50b1c051",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "AsdBG0ecYey3lc08",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "38ec9a93-7eaa-4cb9-9aa1-3b5216174bfc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0fa8d435ac9cc5b32c1ff4ce4278f50282e25f88a80099438850bfcf1d4087f7"
+  },
+  "nodeGroups": [],
+  "id": "AvjLHWYbzB97cRQI",
+  "tags": []
+}
